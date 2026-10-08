@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Macros del Hospital Santa Cruz</title>
+<meta name="description" content="Macros oficiales para el personal médico del Hospital Santa Cruz.">
+<style>
+:root {
+  --green:#16843b; --green2:#2faa52; --dark:#125c2c; --bg:#f4fbf5;
+  --card:#fff; --muted:#6f7d74; --line:#dce9df;
+}
+* { box-sizing:border-box; }
+body { margin:0; font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+       background:linear-gradient(180deg,#dff7e5 0,#f8fbf8 360px); color:#17311f; }
+.wrap { width:min(920px,calc(100% - 28px)); margin:auto; padding:28px 0 50px; }
+.hero { background:linear-gradient(135deg,#d4f6dd,#b9edc9); border-radius:28px; padding:34px 24px;
+         text-align:center; box-shadow:0 10px 30px #164d2720; }
+.icon { font-size:46px; }
+h1 { margin:10px 0 8px; font-size:clamp(27px,5vw,42px); color:#12612e; }
+.hero p { margin:7px 0; font-size:16px; }
+.credit { color:#39704a; font-size:14px; }
+.search { position:sticky; top:12px; z-index:10; margin:20px 0; }
+input { width:100%; border:1px solid #cbded0; border-radius:18px; padding:17px 20px; font-size:16px;
+        outline:none; box-shadow:0 7px 22px #164d2712; }
+input:focus { border-color:#49a765; box-shadow:0 0 0 4px #49a76520; }
+.filters { display:flex; gap:8px; overflow:auto; padding:2px 0 12px; }
+.filter { border:1px solid #cfe0d3; background:#fff; color:#285a38; border-radius:999px; padding:9px 13px;
+           white-space:nowrap; cursor:pointer; }
+.filter.active { background:var(--green); color:#fff; border-color:var(--green); }
+.count { color:var(--muted); font-size:14px; margin:5px 3px 12px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:16px;
+         margin:11px 0; box-shadow:0 5px 18px #164d270b; }
+.tag { display:inline-block; font-size:12px; font-weight:700; color:#18703a; background:#e6f6ea;
+       padding:5px 9px; border-radius:999px; margin-bottom:9px; }
+.macro { background:#f7faf8; border:1px solid #e4ece6; border-radius:13px; padding:13px;
+          font-family:ui-monospace,SFMono-Regular,Menlo,monospace; white-space:pre-wrap; overflow-wrap:anywhere;
+          font-size:14px; line-height:1.45; }
+.copy { width:100%; margin-top:10px; border:0; border-radius:12px; padding:12px; cursor:pointer;
+         background:linear-gradient(90deg,var(--green),var(--green2)); color:#fff; font-weight:800; font-size:14px; }
+.copy.done { background:#1d6d39; }
+.empty { text-align:center; padding:35px 10px; color:var(--muted); }
+footer { text-align:center; color:#789080; font-size:12px; padding-top:22px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <div class="icon">🚑</div>
+    <h1>MACROS DEL HOSPITAL SANTA CRUZ</h1>
+    <p>Macros oficiales para el personal médico.</p>
+    <p>Copia y pega con un solo clic.</p>
+    <div class="credit">Versión inicial • 22 macros</div>
+  </section>
+
+  <div class="search">
+    <input id="search" type="search" placeholder="🔎 Buscar una macro..." autocomplete="off">
+  </div>
+
+  <div class="filters" id="filters"></div>
+  <div class="count" id="count"></div>
+  <main id="list"></main>
+  <footer>Hospital Santa Cruz • Panel de macros</footer>
+</div>
+
+<script>
+const macros = [{"category": "TÁZER", "text": "/do ¡TAZER! ¡TAZER! ¡TAZER!"}, {"category": "Entrenamiento", "text": "/do ENTRENAMIENTO DEFENSA PERSONAL (TAZER)"}, {"category": "Entrenamiento", "text": "/do ENTRENAMIENTO DEFENSA PERSONAL (PELEA)"}, {"category": "Emergencias", "text": "/flobby Preparando vehículo médico en respuesta a llamadas de emergencia"}, {"category": "Seguridad", "text": "/do Cámara de Cuerpo Encendida"}, {"category": "Emergencias", "text": "/flobby En Ruta a Llamada de Emergencia"}, {"category": "Atención médica", "text": "/do Accesando Signos Vitales / Realizando RCP / Aplicando Botiquín a Paciente"}, {"category": "Seguridad", "text": "/me ¡El personal médico no podrá ayudarte durante una balacera o en una zona de peligro o riesgo!"}, {"category": "Códigos", "text": "/flobby (10-8) En Servicio Laboral"}, {"category": "Códigos", "text": "/flobby (10-7) Fuera de Servicio"}, {"category": "Códigos", "text": "/flobby (10-4) Entendido / De Acuerdo"}, {"category": "Medicamentos", "text": "/flobby Iniciando Entrega de Medicamentos"}, {"category": "Comunicaciones", "text": "/flobby Ignorar lo anunciado o lo siguiente"}, {"category": "Códigos", "text": "/flobby (CÓDIGO VERDE) Todas las Llamadas de Emergencia Resueltas"}, {"category": "Códigos", "text": "/flobby (CÓDIGO ROJO) Sala de Hospital Fuera de Control"}, {"category": "Códigos", "text": "/flobby (CÓDIGO AZUL) ¡Se requiere oficial en el hospital! ¡Persona fuera de control o no abandona el hospital!"}, {"category": "Códigos", "text": "/flobby (CODIGO VIOLETA) Personal médico bajo situación de acoso, Requerimos apoyo de altos rangos, policial o de administración"}, {"category": "Entrenamiento", "text": "/flobby Entrenando Nuevo Enfermero (Macros / Rol)"}, {"category": "Logística", "text": "/flobby Vehículo Médico Encontrado (Equipo de Logística)"}, {"category": "Logística", "text": "/flobby Vehículo Médico Guardado (Equipo de Logística)"}, {"category": "Permisos", "text": "/flobby SOLICITO PERMISO PARA HACER RCP O TRABAJO EN CONJUNTO CON UN INSTRUCTOR"}, {"category": "Medicamentos", "text": "/flobby SOLICITO EL (10-4) PARA MISIÓN DE ENTREGA DE MEDICAMENTOS"}, {"category": "Presentación", "text": "/me HOLA MI NOMBRE ES (TU NOMBRE), (TU RANGO) DE LA FACCIÓN MÉDICA DE SANTA CRUZ."}];
+const list = document.getElementById('list');
+const search = document.getElementById('search');
+const filters = document.getElementById('filters');
+const count = document.getElementById('count');
+let active = 'Todas';
+
+const categories = ['Todas', ...new Set(macros.map(m => m.category))];
+
+function renderFilters() {
+  filters.innerHTML = categories.map(c =>
+    `<button class="filter ${c===active?'active':''}" onclick="setCategory(${JSON.stringify(c)})">${c}</button>`
+  ).join('');
+}
+
+function setCategory(c) {
+  active = c; renderFilters(); render();
+}
+
+function render() {
+  const q = search.value.trim().toLowerCase();
+  const results = macros.filter(m =>
+    (active === 'Todas' || m.category === active) &&
+    (!q || m.text.toLowerCase().includes(q) || m.category.toLowerCase().includes(q))
+  );
+  count.textContent = `${results.length} macro${results.length===1?'':'s'} encontrada${results.length===1?'':'s'}`;
+  list.innerHTML = results.length ? results.map((m,i) => `
+    <article class="card">
+      <span class="tag">${m.category}</span>
+      <div class="macro">${escapeHtml(m.text)}</div>
+      <button class="copy" onclick="copyMacro(this, ${JSON.stringify(m.text)})">📋 COPIAR</button>
+    </article>
+  `).join('') : `<div class="empty">😅 No encontramos ninguna macro con esa búsqueda.</div>`;
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+
+async function copyMacro(btn, text) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch(e) {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  const old = btn.textContent;
+  btn.textContent = '✅ ¡COPIADO!';
+  btn.classList.add('done');
+  setTimeout(() => { btn.textContent = old; btn.classList.remove('done'); }, 1300);
+}
+
+search.addEventListener('input', render);
+renderFilters(); render();
+</script>
+</body>
+</html>
